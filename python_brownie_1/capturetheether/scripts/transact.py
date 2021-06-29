@@ -9,8 +9,8 @@ from icecream import ic
 import os
 
 def transact(w3, f):
-    private_key = os.environ['PRIVATE_KEY']
-    account_tx_count = w3.eth.getTransactionCount(os.environ['PUBLIC_KEY'])
+    private_key = os.environ['ETHEREUM_PRIVATE_KEY']
+    account_tx_count = w3.eth.getTransactionCount(os.environ['ETHEREUM_PUBLIC_KEY'])
     ic(account_tx_count)
     ic('sending signed transaction to ', w3)
     transaction_result = w3.eth.send_raw_transaction(w3.eth.account.sign_transaction(f().buildTransaction({'nonce': account_tx_count}), private_key).rawTransaction)
