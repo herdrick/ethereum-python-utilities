@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import click
 from icecream import ic
 from web3 import Web3
