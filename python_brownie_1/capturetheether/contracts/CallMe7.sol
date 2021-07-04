@@ -1,3 +1,4 @@
+
 pragma solidity ^0.8.5;
 
 contract CallMe7 {
@@ -12,12 +13,25 @@ contract CallMe7 {
     return _isComplete;
   }
 
+  function getCompleteXor(bool x) public view returns (bool) {
+    //console.log(".. calling getCompletionStatusView() now..");
+    return _isComplete != x;
+  }
+
+  function chooseString(string memory a, string memory b) public view returns (string memory) {
+    return _isComplete ? a : b;
+  }
+
   function markComplete() public {
     _isComplete = true;
   }
 
   function markNotComplete() public {
     _isComplete = false;
+  }
+
+  function setComplete(bool complete) public {
+    _isComplete = complete;
   }
 
 
