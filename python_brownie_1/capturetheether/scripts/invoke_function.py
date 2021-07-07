@@ -2,7 +2,7 @@
 
 import click
 from icecream import ic
-import q
+#import q
 from web3 import Web3
 import json
 import sys
@@ -11,6 +11,7 @@ import sys
 @click.argument('contract_address')
 @click.argument('function_name')
 @click.argument('abi_file', type=click.File('r'))
+@click.argument('args', nargs=-1)
 @click.option("--network", default="localhost", help="Ethereum network to use. If 'ropsten' or 'mainnet', use Infura, which requires the WEB3_INFURA_PROJECT_ID and WEB3_INFURA_API_SECRET env vars to be set. Default is 'localhost', ex. a local ganache node.")
 @click.option("--transact/--call", default="False", help="""
 If '--transact', initiate a transaction which will be executed on the blockchain.
@@ -31,6 +32,7 @@ def call_or_transact(contract_address, function_name, abi_file, args, network, t
     ABI_FILE: The ABI file of the deployed contract. (An ABI file is a JSON file specification of a contract.)
 
     """
+    ic(contract_address, function_name, abi_file, args, network, transact, ethereum_public_key, ethereum_private_key, nonce)
     if transact:
         assert ethereum_public_key and ethereum_private_key, "If you specify --transact then you must specify ethereum_private_key and ethereum_public_key or set those env vars."
     if network == 'localhost':
@@ -62,14 +64,13 @@ def call_or_transact(contract_address, function_name, abi_file, args, network, t
             ic("no nonce specified; let's get it from w3.eth.getTransactionCount")
             nonce = w3.eth.getTransactionCount(ethereum_public_key)
         ic(nonce)
-        #     w3.eth.send_raw_transaction(w3.eth.account.sign_transaction(f       ().buildTransaction({'nonce': account_tx_count}), private_key).rawTransaction)
         transaction_result = w3.eth.send_raw_transaction(w3.eth.account.sign_transaction(function().buildTransaction({'nonce': nonce}), ethereum_private_key).rawTransaction)
         ic(transaction_result)
         click.echo(f"Success? Transaction address: {transaction_result.hex()}")
     else:
-        call_result = function().call()
+        call_result = function(*args).call() # 'string1', 'string2'
         ic(type(call_result))
-        ic(call_result)
+        print(call_result)
 
 
 if __name__ == "__main__":
