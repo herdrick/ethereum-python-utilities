@@ -20,8 +20,8 @@ If '--call', call a non-mutating 'view' function whose execution will only happe
 Default is '--call'""")
 @click.option('--ethereum_public_key', envvar='ETHEREUM_PUBLIC_KEY', help="Only used for --transact calls.")
 @click.option('--ethereum_private_key', envvar='ETHEREUM_PRIVATE_KEY', help="Only used for --transact calls.")
-@click.option("--nonce", type=int, default=None, help="Only used for --transact calls. If not set, w3.eth.getTransactionCount will be called and its result used as the nonce.")
-def call_or_transact(contract_address, function_name, abi_file, network, transact, ethereum_public_key, ethereum_private_key, nonce):
+@click.option("--nonce", type=click.INT, default=None, help="Only used for --transact calls. If not set, w3.eth.getTransactionCount will be called and its result used as the nonce.")
+def call_or_transact(contract_address, function_name, abi_file, args, network, transact, ethereum_public_key, ethereum_private_key, nonce):
     """Call a function of a smart contract. You must have either an Infura account, if the function is on the mainnet or ropsten, or you must be running a local node (ex. using ganache-cli).
 
     CONTRACT_ADDRESS: The address of the deployed contract.
