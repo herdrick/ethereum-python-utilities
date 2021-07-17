@@ -27,9 +27,19 @@ def call_or_transact(contract_address, function_name, abi_file, args, network, t
 
     CONTRACT_ADDRESS: The address of the deployed contract.
 
-    FUNCTION_NAME: Name of the function in the deployed contract. Ex. 'getCompletionStatusView'
+    FUNCTION_NAME: Name of the function in the deployed contract. Ex. 'getStatus'
 
-    ABI_FILE: The ABI file of the deployed contract. (An ABI file is a JSON file specification of a contract.)
+    ABI_FILE: A containing the ABI of the deployed contract, in json format. If Brownie compiled the contract, you can look in the build/contracts directory for the json file for the contract's class, for example MyContract.json. That file's 'abi' field contains the json which should go in the ABI_FILE.
+
+    Alternatively, you can get the abi json in the brownie console, like so:
+
+        import json
+
+        from brownie import MyContract
+
+        json.dumps(MyContract.abi)
+
+    ... the json.dumps command returns a string which should go in the ABI_FILE.
 
     """
     ic(contract_address, function_name, abi_file, args, network, transact, ethereum_public_key, ethereum_private_key, nonce)
@@ -39,16 +49,24 @@ def call_or_transact(contract_address, function_name, abi_file, args, network, t
         w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
     if network == 'ropsten':
         from web3.auto.infura.ropsten import w3
+    if network == 'rinkeby':
+        from web3.auto.infura.rinkeby import w3
     if network == 'mainchain':
         from web3.auto.infura.mainnet import w3
-    ic(w3.api)
-    ic(w3.eth.protocol_version)
-    ic(w3)
-    ic(w3.isConnected())
     assert w3.isConnected()
     abi = json.load(abi_file)
+    # cast args to types specified in abi
+    function_specs = list(filter(lambda function_spec: function_spec['name']== function_name, abi))
+    if len(function_specs) > 1:
+        raise ValueError(f"Multiple functions found in specified abi with name {function_name}.")
+    if len(function_specs) < 1:
+        raise ValueError(f"No function found in specified abi with name {function_name}.")
+    function_spec = function_specs[0]
+    typed_args = []
+    for arg, input_spec in zip(args, function_spec['inputs']):
+        python_type = ABI_TYPE_TO_PYTHON_TYPE_MAPPING[input_spec['internalType']]
+        typed_args.append(python_type(arg))
     contract_instance = w3.eth.contract(address=contract_address, abi=abi)
-    ic(contract_instance.address)
     functions = contract_instance.all_functions()
     function = None
     for f in functions:
@@ -68,8 +86,7 @@ def call_or_transact(contract_address, function_name, abi_file, args, network, t
         ic(transaction_result)
         click.echo(f"Success? Transaction address: {transaction_result.hex()}")
     else:
-        call_result = function(*args).call() # 'string1', 'string2'
-        ic(type(call_result))
+        call_result = function(*typed_args).call() # 'string1', 'string2'
         print(call_result)
 
 
