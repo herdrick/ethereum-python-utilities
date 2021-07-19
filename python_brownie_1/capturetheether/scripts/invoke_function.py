@@ -4,6 +4,7 @@ import click
 from icecream import ic
 #import q
 from web3 import Web3
+from web3.middleware import construct_sign_and_send_raw_middleware
 import json
 import sys
 
@@ -35,7 +36,7 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
 
     FUNCTION_NAME: Name of the function in the deployed contract. Ex. 'getStatus'
 
-    ABI_FILE: A containing the ABI of the deployed contract, in json format. If Brownie compiled the contract, you can look in the build/contracts directory for the json file for the contract's class, for example MyContract.json. That file's 'abi' field contains the json which should go in the ABI_FILE.
+    ABI_FILE: A file containing the ABI of the deployed contract, in json format. If Brownie compiled the contract, you can look in the build/contracts directory for the json file for the contract's class, for example MyContract.json. That file's 'abi' field contains the json which should go in the ABI_FILE.
 
     Alternatively, you can get the abi json in the brownie console, like so:
 
@@ -100,10 +101,11 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
             if verbose:
                 ic("no nonce specified; let's get it from w3.eth.getTransactionCount")
             nonce = w3.eth.getTransactionCount(ethereum_public_key)
+        w3.middleware_onion.add(construct_sign_and_send_raw_middleware(ethereum_private_key))
         if verbose:
             ic(nonce)
             ic(ethereum_public_key, ethereum_private_key)
-        transaction_result = w3.eth.send_raw_transaction(w3.eth.account.sign_transaction(function().buildTransaction({'nonce': nonce}), ethereum_private_key).rawTransaction)
+        transaction_result = w3.eth.send_transaction(function().buildTransaction({'nonce': nonce, 'from': ethereum_public_key}))
         if verbose:
             ic(transaction_result)
         click.echo(f"Success? Transaction address: {transaction_result.hex()}")
