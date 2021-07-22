@@ -8,10 +8,16 @@ from web3.middleware import construct_sign_and_send_raw_middleware
 import json
 import sys
 
+
+
+_powers_of_two = [2**n for n in range(9)]
+_solidity_int_types = [x + str(power_of_two) for power_of_two in _powers_of_two[3:] + [''] for x in ['int', 'uint']]
+_solidity_bytes_types = ['bytes' + str(power_of_two) for power_of_two in _powers_of_two[0:5] + ['']]
 ABI_TYPE_TO_PYTHON_TYPE_MAPPING = {'string': str,
-                                   'bool': bool,
-                                   'int64': int,
-                                   'int64': int}
+                                   'bool': lambda s: s in ['false', 'False'],
+                                   'address': str}
+ABI_TYPE_TO_PYTHON_TYPE_MAPPING.update(zip(_solidity_int_types, len(_solidity_int_types) * [int]))  # we will convert all Solidity int types map to Python int
+ABI_TYPE_TO_PYTHON_TYPE_MAPPING.update(zip(_solidity_bytes_types, len(_solidity_bytes_types) * [lambda s: bytes(s, encoding='utf-8')]))  # we will convert all Solidity bytes types to Python bytes (using UTF-8)
 
 @click.command()
 @click.argument('contract_address')
