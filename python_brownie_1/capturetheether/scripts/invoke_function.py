@@ -58,7 +58,10 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
 
     """
     if verbose:
-        ic(contract_address, function_name, abi_file, args, network, transact, ethereum_public_key, ethereum_private_key, nonce)
+        from icecream import ic
+    else:
+        ic = lambda *x: None
+    ic(contract_address, function_name, abi_file, args, network, transact, ethereum_public_key, ethereum_private_key, nonce)
     if transact:
         assert ethereum_public_key and ethereum_private_key, "If you specify --transact then you must specify ethereum_private_key and ethereum_public_key or set those env vars."
     if network == 'localhost':
@@ -69,11 +72,10 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
         from web3.auto.infura.rinkeby import w3
     if network == 'mainchain':
         from web3.auto.infura.mainnet import w3
-    if verbose:
-        ic(w3.api)
-        ic(w3.eth.protocol_version)
-        ic(w3)
-        ic(w3.isConnected())
+    ic(w3.api)
+    ic(w3.eth.protocol_version)
+    ic(w3)
+    ic(w3.isConnected())
     assert w3.isConnected()
     abi = json.load(abi_file)
     # cast args to types specified in abi
@@ -83,45 +85,37 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
     if len(function_specs) < 1:
         raise ValueError(f"No function found in specified abi with name {function_name}.")
     function_spec = function_specs[0]
-    if verbose:
-        ic(function_spec)
+    ic(function_spec)
     typed_args = []
     for arg, input_spec in zip(args, function_spec['inputs']):
         python_type = ABI_TYPE_TO_PYTHON_TYPE_MAPPING[input_spec['internalType']]
         typed_args.append(python_type(arg))
-    if verbose:
-        ic(typed_args)
+    ic(typed_args)
     contract_instance = w3.eth.contract(address=contract_address, abi=abi)
-    if verbose:
-        ic(contract_instance.address)
+    ic(contract_instance.address)
     functions = contract_instance.all_functions()
     function = None
     for f in functions:
         if f.fn_name == function_name:
             function = f
     if not function:
-        click.echo(f"Specified function {function_name} does not exist in contract {contract_address}")
+        click.echo(f"Specified function {function_name} does not exist in contract {contract_address}", err=True)
         sys.exit(1)
-    if verbose:
-        ic(function)
+    ic(function)
     if transact:
         if not nonce:
-            if verbose:
-                ic("no nonce specified; let's get it from w3.eth.getTransactionCount")
+            ic("no nonce specified; let's get it from w3.eth.getTransactionCount")
             nonce = w3.eth.getTransactionCount(ethereum_public_key)
         w3.middleware_onion.add(construct_sign_and_send_raw_middleware(ethereum_private_key))
-        if verbose:
-            ic(nonce)
-            ic(ethereum_public_key, ethereum_private_key)
+        ic(nonce)
+        ic(ethereum_public_key, ethereum_private_key)
         transaction_result = w3.eth.send_transaction(function(*typed_args).buildTransaction({'nonce': nonce, 'from': ethereum_public_key}))
-        if verbose:
-            ic(transaction_result)
-        ic("Success? Transaction hash:")
+        ic(transaction_result)
+        click.echo("Success? Transaction hash:", err=True)
         click.echo(transaction_result.hex())
     else:
         call_result = function(*typed_args).call() # 'string1', 'string2'
-        if verbose:
-            ic(type(call_result))
+        ic(type(call_result))
         print(call_result)
 
 
