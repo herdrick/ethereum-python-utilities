@@ -118,7 +118,8 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
         transaction_result = w3.eth.send_transaction(function(*typed_args).buildTransaction({'nonce': nonce, 'from': ethereum_public_key}))
         if verbose:
             ic(transaction_result)
-        click.echo(f"Success? Transaction address: {transaction_result.hex()}")
+        ic("Success? Transaction hash:")
+        click.echo(transaction_result.hex())
     else:
         call_result = function(*typed_args).call() # 'string1', 'string2'
         if verbose:
