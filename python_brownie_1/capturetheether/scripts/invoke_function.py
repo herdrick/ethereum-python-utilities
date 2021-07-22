@@ -52,6 +52,10 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
 
         json.dumps(MyContract.abi)
 
+        with open("abis/MyContract.abi.json", "w") as abi_file:
+
+            abi_file.write(json.dumps(MyContract.abi))
+
     ... the json.dumps command returns a string which should go in the ABI_FILE.
 
     """
