@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
-import click
-from icecream import ic
-#import q
-from web3 import Web3
-from web3.middleware import construct_sign_and_send_raw_middleware
 import json
 import sys
+import click
+from icecream import ic
+from web3 import Web3
+from web3.middleware import construct_sign_and_send_raw_middleware
 
 _powers_of_two = [2**n for n in range(9)]
 _solidity_int_types = [x + str(power_of_two) for power_of_two in _powers_of_two[3:] + [''] for x in ['int', 'uint']]
