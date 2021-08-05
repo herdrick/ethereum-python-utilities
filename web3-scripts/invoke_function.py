@@ -41,7 +41,7 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
 
     ABI_FILE: A file containing the ABI of the deployed contract, in json format. If Brownie compiled the contract, you can look in the build/contracts directory for the json file for the contract's class, for example MyContract.json. That file's 'abi' field contains the json which should go in the ABI_FILE.
 
-    Alternatively, you can get the abi json in the brownie console, like so:
+    Alternatively, you can get the abi json in the brownie console, and write it to a file, like so:
 
         import json
 
@@ -53,7 +53,6 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
 
             abi_file.write(json.dumps(MyContract.abi))
 
-    ... the json.dumps command returns a string which should go in the ABI_FILE.
 
     """
     if verbose:
