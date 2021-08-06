@@ -1,5 +1,3 @@
-// (setq highlight-symbol-on-navigation-p t)
-
 pragma solidity ^0.8.5;
 
 

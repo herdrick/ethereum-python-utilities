@@ -37,7 +37,7 @@ def call_or_transact(contract_address, function_name, abi_file, args, verbose, n
 
     CONTRACT_ADDRESS: The address of the deployed contract.
 
-    FUNCTION_NAME: Name of the function in the deployed contract. Ex. 'getStatus'
+    FUNCTION_NAME: Name of the function in the deployed contract.
 
     ABI_FILE: A file containing the ABI of the deployed contract, in json format. If Brownie compiled the contract, you can look in the build/contracts directory for the json file for the contract's class, for example MyContract.json. That file's 'abi' field contains the json which should go in the ABI_FILE.
 
