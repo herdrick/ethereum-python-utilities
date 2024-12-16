@@ -1,3 +1,0 @@
-# This is a minimal requirements file. It was handrolled, not made by 'pip freeze'.
-click>=7.1.2
-eth-brownie>=1.14.6
