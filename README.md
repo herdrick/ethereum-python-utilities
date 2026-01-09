@@ -2,12 +2,12 @@
 
 This is a convenience script useful for interacting with deployed contracts.
 
-## Installation
+## Install
 Uses python 3.
 
 ```pip install -r web3-scripts/requirements.txt```
 
-##
+## Use
 ```
 $ web3-scripts/invoke_function.py --help
 
